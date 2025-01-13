@@ -1,10 +1,20 @@
-#!/bin/sh
+#!/bin/bash
+
+echo "Running pre-push hook"
+
 while read local_ref local_sha remote_ref remote_sha; do
+    echo "Hello"
+    echo "Local SHA: $local_sha"
+    echo "Remote Ref: $remote_ref"
+
+    # Extract the branch name from local_ref
     branch_name=$(echo "$local_ref" | sed 's/refs\/heads\///')
+    echo "Branch Name: $branch_name"
 done
 
 if [ "$branch_name" = "main" ]; then
     echo "branch_name is $branch_name"
 else
     echo "branch_name is not main"
+    echo "branch_name is $branch_name"
 fi
