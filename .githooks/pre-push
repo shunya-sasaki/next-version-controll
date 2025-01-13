@@ -5,4 +5,6 @@ done
 
 if [ "$branch_name" = "main" ]; then
     echo "branch_name is $branch_name"
+else
+    echo "branch_name is not main"
 fi
