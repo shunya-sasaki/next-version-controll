@@ -10,20 +10,27 @@ const getGitVersion = () => {
   const major = parseInt(versionNumbers[0]);
   const minor = parseInt(versionNumbers[1]);
   const patch = parseInt(versionNumbers[2]);
-  const commitCount = execSync(`git rev-list --count ${latestTag}..HEAD`, {
-    encoding: "utf-8",
-  }).trim();
+  const commitCount = parseInt(
+    execSync(`git rev-list --count ${latestTag}..HEAD`, {
+      encoding: "utf-8",
+    }).trim()
+  );
   const currentHash = execSync("git rev-parse --short HEAD", {
     encoding: "utf-8",
   }).trim();
   const status = execSync("git status -s", { encoding: "utf-8" }).trim();
-  if (status === "") {
-    console.log("No changes since last commit.");
+  let version = "";
+  if (commitCount === 0) {
+    if (status === "") {
+      version = `${major}.${minor}.${patch}`;
+    } else {
+      version = `${major}.${minor}.${patch}.dev${commitCount}+${currentHash}`;
+    }
+  } else {
+    version = `${major}.${minor}.${patch}.dev${commitCount}+${currentHash}`;
   }
-
-  console.log(`Current hash: ${currentHash}`);
-  console.log(`Last tag version: ${major}.${minor}.${patch}}`);
-  console.log(`Count of commits since last tag: ${commitCount}`);
+  console.log(`Version: ${version}`);
+  return version;
 };
 
 getGitVersion();
