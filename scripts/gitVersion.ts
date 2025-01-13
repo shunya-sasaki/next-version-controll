@@ -60,6 +60,16 @@ const updateVersion = (version: string, environment: string) => {
   fs.writeFileSync(envFilePath, outputContent);
 };
 
+const updatePackageJson = (version: string) => {
+  const targetJsonPaths = ["package.json", "package-lock.json"];
+  targetJsonPaths.map((targetJsonPath) => {
+    const packageJson = JSON.parse(fs.readFileSync(targetJsonPath, "utf8"));
+    packageJson.version = version;
+    fs.writeFileSync(targetJsonPath, JSON.stringify(packageJson, null, 2));
+  });
+};
+
 const environment = process.argv[2];
 const version = getGitVersion();
 updateVersion(version, environment);
+updatePackageJson(version);
