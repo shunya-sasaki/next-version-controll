@@ -24,13 +24,42 @@ const getGitVersion = () => {
     if (status === "") {
       version = `${major}.${minor}.${patch}`;
     } else {
-      version = `${major}.${minor}.${patch}.dev${commitCount}+${currentHash}`;
+      version = `${major}.${minor}.${
+        patch + 1
+      }.dev${commitCount}+${currentHash}`;
     }
   } else {
-    version = `${major}.${minor}.${patch}.dev${commitCount}+${currentHash}`;
+    version = `${major}.${minor}.${patch + 1}.dev${commitCount}+${currentHash}`;
   }
-  console.log(`Version: ${version}`);
   return version;
 };
 
-getGitVersion();
+const updateVersion = (version: string, environment: string) => {
+  const envFilePath =
+    environment === "development" ? ".env.development" : ".env.production";
+  let envContent = "";
+  if (fs.existsSync(envFilePath)) {
+    envContent = fs.readFileSync(envFilePath, { encoding: "utf8" });
+  }
+  let isUpdate = false;
+  const updatedContent = envContent
+    .split("\n")
+    .map((line) => {
+      if (line.startsWith("NEXT_PUBLIC_GIT_VERSION=")) {
+        isUpdate = true;
+        return `NEXT_PUBLIC_GIT_VERSION=${version}`;
+      } else {
+        return line;
+      }
+    })
+    .filter(Boolean)
+    .join("\n");
+  const outputContent = isUpdate
+    ? updatedContent
+    : `NEXT_PUBLIC_GIT_VERSION=${version}\n${envContent}`;
+  fs.writeFileSync(envFilePath, outputContent);
+};
+
+const environment = process.argv[2];
+const version = getGitVersion();
+updateVersion(version, environment);
