@@ -125,7 +125,6 @@ if (
 ) {
   console.log("No changes since last tag.)");
   console.log("Start updating package.json.");
-  const message = getMessageFromTag(gitStatus.latestTag);
   deleteTag(gitStatus.latestTag);
   console.log("Deleted tag: " + gitStatus.latestTag);
   updateVersion(version, "development");
@@ -133,8 +132,7 @@ if (
   console.log("Updated .env.development and .env.production");
   updatePackageJson(version);
   console.log("Updated package.json");
-  commit(message);
-  console.log("Committed changes with message: " + message);
+  commit(`Release ${gitStatus.latestTag}`);
   tag(gitStatus.latestTag);
   console.log("Tagged with: " + gitStatus.latestTag);
 } else {
