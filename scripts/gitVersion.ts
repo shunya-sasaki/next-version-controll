@@ -150,7 +150,7 @@ if (
   add("package.json");
   add("package-lock.json");
   console.log("Added package.json and package-lock.json.");
-  commit(`Release ${version}`);
+  commit(`Release ${gitStatus.latestTag}`);
   pull();
   tag(gitStatus.latestTag);
   pushTag();
