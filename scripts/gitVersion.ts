@@ -125,9 +125,9 @@ if (
 ) {
   console.log("No changes since last tag.)");
   console.log("Start updating package.json.");
+  const message = getMessageFromTag(gitStatus.latestTag);
   deleteTag(gitStatus.latestTag);
   console.log("Deleted tag: " + gitStatus.latestTag);
-  const message = getMessageFromTag(gitStatus.latestTag);
   updateVersion(version, "development");
   updateVersion(version, "production");
   console.log("Updated .env.development and .env.production");
