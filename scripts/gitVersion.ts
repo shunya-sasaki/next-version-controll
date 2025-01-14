@@ -122,7 +122,7 @@ const push = () => {
   execSync("git push");
 };
 const pull = () => {
-  execSync("git pull");
+  execSync("git pull --rebase");
 };
 
 const gitStatus = getGitStatus();
