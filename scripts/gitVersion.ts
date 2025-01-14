@@ -146,9 +146,12 @@ if (
   updateVersion(version, "development");
   updateVersion(version, "production");
   updatePackageJson(version);
+  console.log("Updated package.json.");
   add("package.json");
   add("package-lock.json");
+  console.log("Added package.json and package-lock.json.");
   commitAmend();
+  console.log("Amended commit.");
   tag(gitStatus.latestTag);
   pushTag();
 } else {
