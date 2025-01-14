@@ -112,7 +112,7 @@ const commit = (message: string) => {
 };
 
 const commitAmend = () => {
-  execSync(`git commit --amend --no-edit"`);
+  execSync(`git commit --amend --no-edit`);
 };
 const add = (fileName: string) => {
   execSync(`git add ${fileName}`);
