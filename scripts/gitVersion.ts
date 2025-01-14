@@ -1,7 +1,19 @@
 import { execSync } from "child_process";
 import fs from "fs";
 
-const getGitVersion = () => {
+interface GitStatus {
+  version: string;
+  major: number;
+  minor: number;
+  patch: number;
+  commitCount: number;
+  currentHash: string;
+  latestTag: string;
+  latestTagHash: string;
+  hasChanges: boolean;
+}
+
+const getGitStatus = () => {
   const latestTag = execSync("git describe --tags --abbrev=0", {
     encoding: "utf-8",
   }).trim();
@@ -18,10 +30,14 @@ const getGitVersion = () => {
   const currentHash = execSync("git rev-parse --short HEAD", {
     encoding: "utf-8",
   }).trim();
+  const latestTagHash = execSync(`git rev-parse --short ${latestTag}`, {
+    encoding: "utf-8",
+  }).trim();
   const status = execSync("git status -s", { encoding: "utf-8" }).trim();
+  const hasChanges = status === "" ? false : true;
   let version = "";
   if (commitCount === 0) {
-    if (status === "") {
+    if (!hasChanges) {
       version = `${major}.${minor}.${patch}`;
     } else {
       version = `${major}.${minor}.${
@@ -31,7 +47,18 @@ const getGitVersion = () => {
   } else {
     version = `${major}.${minor}.${patch + 1}.dev${commitCount}+${currentHash}`;
   }
-  return version;
+  const gitStatus: GitStatus = {
+    version,
+    major,
+    minor,
+    patch,
+    commitCount,
+    currentHash,
+    latestTag,
+    latestTagHash,
+    hasChanges,
+  };
+  return gitStatus;
 };
 
 const updateVersion = (version: string, environment: string) => {
@@ -69,7 +96,51 @@ const updatePackageJson = (version: string) => {
   });
 };
 
-const environment = process.argv[2];
-const version = getGitVersion();
-updateVersion(version, environment);
-updatePackageJson(version);
+const deleteTag = (latestTag: string) => {
+  execSync(`git tag -d ${latestTag}`);
+};
+
+const getMessageFromTag = (tag: string) => {
+  const message = execSync(`git show ${tag} --no-patch --pretty=%s`, {
+    encoding: "utf-8",
+  }).trim();
+  return message;
+};
+
+const commit = (message: string) => {
+  execSync(`git commit -am "${message}"`);
+};
+
+const tag = (tag: string) => {
+  execSync(`git tag -a ${tag} -m ""`);
+};
+
+const gitStatus = getGitStatus();
+const version = gitStatus.version;
+if (
+  gitStatus.commitCount === 0 &&
+  !gitStatus.hasChanges &&
+  gitStatus.latestTagHash !== gitStatus.currentHash
+) {
+  console.log("No changes since last tag.)");
+  console.log("Start updating package.json.");
+  deleteTag(gitStatus.latestTag);
+  console.log("Deleted tag: " + gitStatus.latestTag);
+  const message = getMessageFromTag(gitStatus.latestTag);
+  updateVersion(version, "development");
+  updateVersion(version, "production");
+  console.log("Updated .env.development and .env.production");
+  updatePackageJson(version);
+  console.log("Updated package.json");
+  commit(message);
+  console.log("Committed changes with message: " + message);
+  tag(gitStatus.latestTag);
+  console.log("Tagged with: " + gitStatus.latestTag);
+} else {
+  let environment = "development";
+  if (process.argv.length === 3) {
+    environment = process.argv[2];
+  }
+  updateVersion(version, environment);
+  updatePackageJson(version);
+}
