@@ -158,7 +158,7 @@ if (
   let environment = "development";
   if (process.argv.length === 3) {
     environment = process.argv[2];
+    updateVersion(version, environment);
+    updatePackageJson(version);
   }
-  updateVersion(version, environment);
-  updatePackageJson(version);
 }
