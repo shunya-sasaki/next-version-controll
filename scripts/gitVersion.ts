@@ -145,9 +145,8 @@ if (
   commit(`Release ${gitStatus.latestTag}`);
   tag(gitStatus.latestTag);
   console.log("Tagged with: " + gitStatus.latestTag);
-  pushTag();
   pull();
-  push();
+  pushTag();
 } else {
   let environment = "development";
   if (process.argv.length === 3) {
