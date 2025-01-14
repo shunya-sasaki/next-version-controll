@@ -111,6 +111,13 @@ const commit = (message: string) => {
   execSync(`git commit -am "${message}"`);
 };
 
+const commitAmend = () => {
+  execSync(`git commit --amend --no-edit}"`);
+};
+const add = (fileName: string) => {
+  execSync(`git add ${fileName}`);
+};
+
 const tag = (tag: string) => {
   execSync(`git tag -a ${tag} -m ""`);
 };
@@ -122,7 +129,7 @@ const push = () => {
   execSync("git push");
 };
 const pull = () => {
-  execSync("git pull --rebase");
+  execSync("git pull");
 };
 
 const gitStatus = getGitStatus();
@@ -136,17 +143,13 @@ if (
   console.log("No changes since last tag.)");
   console.log("Start updating package.json.");
   deleteTag(gitStatus.latestTag);
-  console.log("Deleted tag: " + gitStatus.latestTag);
   updateVersion(version, "development");
   updateVersion(version, "production");
-  console.log("Updated .env.development and .env.production");
   updatePackageJson(version);
-  console.log("Updated package.json");
-  commit(`Release ${gitStatus.latestTag}`);
+  add("package.json");
+  add("package-lock.json");
+  commitAmend();
   tag(gitStatus.latestTag);
-  console.log("Tagged with: " + gitStatus.latestTag);
-  pull();
-  push();
   pushTag();
 } else {
   let environment = "development";
