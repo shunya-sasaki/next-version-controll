@@ -118,6 +118,9 @@ const tag = (tag: string) => {
 const pushTag = () => {
   execSync("git push --tags");
 };
+const push = () => {
+  execSync("git push");
+};
 
 const gitStatus = getGitStatus();
 const version = gitStatus.version;
@@ -140,6 +143,7 @@ if (
   tag(gitStatus.latestTag);
   console.log("Tagged with: " + gitStatus.latestTag);
   pushTag();
+  push();
 } else {
   let environment = "development";
   if (process.argv.length === 3) {
