@@ -121,7 +121,7 @@ console.log(gitStatus);
 if (
   gitStatus.commitCount === 0 &&
   !gitStatus.hasChanges &&
-  gitStatus.latestTagHash !== gitStatus.currentHash
+  gitStatus.latestTagHash == gitStatus.currentHash
 ) {
   console.log("No changes since last tag.)");
   console.log("Start updating package.json.");
