@@ -117,6 +117,7 @@ const tag = (tag: string) => {
 
 const gitStatus = getGitStatus();
 const version = gitStatus.version;
+console.log(gitStatus);
 if (
   gitStatus.commitCount === 0 &&
   !gitStatus.hasChanges &&
