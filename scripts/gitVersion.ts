@@ -146,6 +146,7 @@ if (
   tag(gitStatus.latestTag);
   console.log("Tagged with: " + gitStatus.latestTag);
   pull();
+  push();
   pushTag();
 } else {
   let environment = "development";
