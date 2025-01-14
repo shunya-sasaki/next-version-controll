@@ -115,6 +115,10 @@ const tag = (tag: string) => {
   execSync(`git tag -a ${tag} -m ""`);
 };
 
+const pushTag = () => {
+  execSync("git push --tags");
+};
+
 const gitStatus = getGitStatus();
 const version = gitStatus.version;
 console.log(gitStatus);
@@ -135,6 +139,7 @@ if (
   commit(`Release ${gitStatus.latestTag}`);
   tag(gitStatus.latestTag);
   console.log("Tagged with: " + gitStatus.latestTag);
+  pushTag();
 } else {
   let environment = "development";
   if (process.argv.length === 3) {
