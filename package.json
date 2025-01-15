@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "release": "node ./scripts/gitVersion.ts release"
   },
   "dependencies": {
     "react": "^19.0.0",

@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import fs from "fs";
+import { env } from "process";
 
 interface GitStatus {
   version: string;
@@ -111,9 +112,6 @@ const commit = (message: string) => {
   execSync(`git commit -am "${message}"`);
 };
 
-const commitAmend = () => {
-  execSync(`git commit --amend --no-edit`);
-};
 const add = (fileName: string) => {
   execSync(`git add ${fileName}`);
 };
@@ -126,16 +124,19 @@ const pushTag = () => {
   execSync("git push --tags");
 };
 const push = () => {
-  execSync("git push");
+  execSync("git push --no-verify");
 };
 const pull = () => {
   execSync("git pull");
 };
 
+const environment = process.argv[2];
 const gitStatus = getGitStatus();
 const version = gitStatus.version;
-console.log(gitStatus);
-if (
+if (environment === "development" || environment === "production") {
+  updateVersion(version, environment);
+  updatePackageJson(version);
+} else if (
   gitStatus.commitCount === 0 &&
   !gitStatus.hasChanges &&
   gitStatus.latestTagHash == gitStatus.currentHash
@@ -151,14 +152,13 @@ if (
   add("package-lock.json");
   console.log("Added package.json and package-lock.json.");
   commit(`Release ${gitStatus.latestTag}`);
-  pull();
   tag(gitStatus.latestTag);
+  push();
   pushTag();
 } else {
-  let environment = "development";
-  if (process.argv.length === 3) {
-    environment = process.argv[2];
-    updateVersion(version, environment);
-    updatePackageJson(version);
-  }
+  console.log("");
+  console.log(
+    "[ERROR] Please commit your changes and tag berfore running this script!"
+  );
+  console.log("");
 }
