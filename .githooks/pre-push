@@ -9,7 +9,16 @@ done
 
 if [ "$branch_name" = "main" ]; then
     echo "branch_name is $branch_name"
-    node ./scripts/gitVersion.ts
+    latest_tag=$(git describe --tags --abbrev=0)
+    commit_count_since_latest_tag=$(git rev-list $latest_tag..HEAD --count)
+    if [ commit_count_since_latest_tag -eq 0 ]; then
+        echo "No new commits since latest tag"
+        exit 0
+    else
+        echo "New commits since latest tag"
+        node ./scripts/gitVersion.ts
+        exit 1
+    fi
 elif [ "$branch_name" = "" ]; then
     echo "No changes pushed"
 else
