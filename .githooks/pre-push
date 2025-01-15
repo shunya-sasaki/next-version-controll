@@ -8,23 +8,9 @@ while read local_ref local_sha remote_ref remote_sha; do
 done
 
 if [ "$branch_name" = "main" ]; then
-    echo "branch_name is $branch_name"
-    node ./scripts/gitVersion.ts
-    latest_tag=$(git describe --tags --abbrev=0)
-    commit_count_since_latest_tag=$(git rev-list $latest_tag..HEAD --count)
-    status=$(git status -s)
-    if [ $commit_count_since_latest_tag -eq 0 ]; then
-        if [ "$status" = "" ]; then
-            echo "No changes pushed"
-            exit 0
-        else
-            echo "Uncommitted changes"
-            exit 1
-        fi
-    else
-        echo "New commits since latest tag"
-        exit 1
-    fi
+    echo "Pushing to main branch with normal push is not allowed!"
+    echo "Please use the command $(npm run release) to push changes!!"
+    exit 1
 elif [ "$branch_name" = "" ]; then
     echo "No changes pushed"
 else
