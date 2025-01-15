@@ -8,8 +8,8 @@ while read local_ref local_sha remote_ref remote_sha; do
 done
 
 if [ "$branch_name" = "main" ]; then
-    echo "Pushing to main branch with normal push is not allowed!"
-    echo "Please use the command \`npm run release\` to push changes!!"
+    echo "Pushing to main branch with normal push is not allowed!" >&2
+    echo "Please use the command \`npm run release\` to push changes!!" >&2
     exit 1
 elif [ "$branch_name" = "" ]; then
     echo "No changes pushed"
