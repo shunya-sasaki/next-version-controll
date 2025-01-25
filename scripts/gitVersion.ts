@@ -1,3 +1,6 @@
+/**
+ * This script is used to update the version of the package.json and .env files.
+ */
 import { execSync } from "child_process";
 import fs from "fs";
 
