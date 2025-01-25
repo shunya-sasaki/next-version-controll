@@ -1,6 +1,5 @@
 import { execSync } from "child_process";
 import fs from "fs";
-import { env } from "process";
 
 interface GitStatus {
   version: string;
@@ -93,6 +92,9 @@ const updatePackageJson = (version: string) => {
   targetJsonPaths.map((targetJsonPath) => {
     const packageJson = JSON.parse(fs.readFileSync(targetJsonPath, "utf8"));
     packageJson.version = version;
+    if (targetJsonPath === "package-lock.json") {
+      packageJson.packages[""].version = version;
+    }
     fs.writeFileSync(targetJsonPath, JSON.stringify(packageJson, null, 2));
   });
 };
@@ -101,15 +103,12 @@ const deleteTag = (latestTag: string) => {
   execSync(`git tag -d ${latestTag}`);
 };
 
-const getMessageFromTag = (tag: string) => {
-  const message = execSync(`git show ${tag} --no-patch --pretty=%s`, {
-    encoding: "utf-8",
-  }).trim();
-  return message;
-};
-
-const commit = (message: string) => {
-  execSync(`git commit -am "${message}"`);
+const commit = (message: string, verify: boolean = true) => {
+  if (verify) {
+    execSync(`git commit -am "${message}"`);
+  } else {
+    execSync(`git commit --no-verify -m "${message}"`);
+  }
 };
 
 const add = (fileName: string) => {
@@ -126,9 +125,6 @@ const pushTag = () => {
 const push = () => {
   execSync("git push --no-verify");
 };
-const pull = () => {
-  execSync("git pull");
-};
 
 const environment = process.argv[2];
 const gitStatus = getGitStatus();
@@ -136,6 +132,11 @@ const version = gitStatus.version;
 if (environment === "development" || environment === "production") {
   updateVersion(version, environment);
   updatePackageJson(version);
+  updatePackageJson(version);
+  add(".env.development");
+  add(".env.production");
+  add("package.json");
+  add("package-lock.json");
 } else if (
   gitStatus.commitCount === 0 &&
   !gitStatus.hasChanges &&
@@ -143,14 +144,16 @@ if (environment === "development" || environment === "production") {
 ) {
   console.log("No changes since last tag.)");
   console.log("Start updating package.json.");
-  deleteTag(gitStatus.latestTag);
   updateVersion(version, "development");
   updateVersion(version, "production");
+  add(".env.development");
+  add(".env.production");
   updatePackageJson(version);
   console.log("Updated package.json.");
   add("package.json");
   add("package-lock.json");
   console.log("Added package.json and package-lock.json.");
+  deleteTag(gitStatus.latestTag);
   commit(`Release ${gitStatus.latestTag}`);
   tag(gitStatus.latestTag);
   push();

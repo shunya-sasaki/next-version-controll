@@ -1,7 +1,5 @@
 #!/bin/bash
 echo "Running pre-push hook"
-current_dir=$(pwd)
-echo "Current directory is $current_dir"
 
 while read local_ref local_sha remote_ref remote_sha; do
     branch_name=$(echo "$local_ref" | sed 's/refs\/heads\///')
